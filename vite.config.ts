@@ -14,7 +14,11 @@ export default defineConfig({
     federation({
       name: "shell",
       filename: "remoteEntry.js",
-      exposes: {},
+      // What every portal imports instead of owning (norm 5.4.1): the client and the session.
+      exposes: {
+        "./apiClient": "./src/core/http/apiClient.ts",
+        "./session": "./src/core/auth/session.ts",
+      },
       remotes: {},
       shared: {
         react: { singleton: true },
@@ -22,6 +26,8 @@ export default defineConfig({
         "react-router": { singleton: true },
       },
       shareStrategy: "loaded-first",
+      // Portals declare the exposed modules in their own shell.d.ts (Annex H); no generated types.
+      dts: false,
     }),
   ],
   server: { port: 5173, strictPort: true },

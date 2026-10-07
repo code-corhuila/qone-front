@@ -38,5 +38,10 @@
     "vite": "^7.1.0",
     "vitest": "^3.2.0",
     "yaml": "^2.8.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
