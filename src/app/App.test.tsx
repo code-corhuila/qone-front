@@ -23,11 +23,20 @@ describe("App shell", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Sign in" })).toBeInTheDocument();
   });
 
-  it("greets a signed-in person on the home route", () => {
+  it("greets a signed-in person on the home route, inside the layout with navigation", () => {
     session.signIn(identityFixtures.devToken(identityFixtures.carlos));
     render(<App />);
 
-    expect(screen.getByText("Carlos Méndez")).toBeInTheDocument();
-    expect(screen.getByText("PROFESSOR")).toBeInTheDocument();
+    expect(screen.getByText("Carlos Ramírez")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+  });
+
+  it("answers an unknown route with the 404 page (Annex H)", () => {
+    session.signIn(identityFixtures.devToken(identityFixtures.laura));
+    window.history.replaceState(null, "", "/does-not-exist");
+    render(<App />);
+
+    expect(screen.getByRole("heading", { level: 2, name: "Page not found" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Go to the home page" })).toHaveAttribute("href", "/");
   });
 });

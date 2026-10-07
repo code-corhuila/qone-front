@@ -11,7 +11,8 @@ coverage/
 keys/
 *.pem
 
-# editors and OS
+# editors, agents and OS
+.claude/
 .vscode/
 .idea/
 .DS_Store

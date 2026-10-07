@@ -8,6 +8,12 @@ interface ImportMetaEnv {
   readonly VITE_DEV_LOGIN?: string;
   /** "true" serves synthetic data with MSW instead of calling the gateway (ADR-009). */
   readonly VITE_USE_MOCKS?: string;
+  /** remoteEntry.js of each domain portal; empty when the portal is not deployed (Annex H). */
+  readonly VITE_REMOTE_IDENTITY_URL?: string;
+  readonly VITE_REMOTE_CATALOG_URL?: string;
+  readonly VITE_REMOTE_ENROLLMENT_URL?: string;
+  readonly VITE_REMOTE_BILLING_URL?: string;
+  readonly VITE_REMOTE_ADVISOR_URL?: string;
 }
 
 interface ImportMeta {
