@@ -1,0 +1,35 @@
+# The shell as qone-infra composes it (Annex G: infra includes this file). The image is built
+# here with the environment's Vite variables; only in develop is the port published to the host
+# (FRONT_PORT); in qa and main the shell is reached through the gateway's static route.
+services:
+  qone-front:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        VITE_GATEWAY_URL: ${VITE_GATEWAY_URL:-http://localhost:8080}
+        VITE_DEV_LOGIN: ${VITE_DEV_LOGIN:-false}
+        VITE_USE_MOCKS: ${VITE_USE_MOCKS:-false}
+        VITE_REMOTE_IDENTITY_URL: ${VITE_REMOTE_IDENTITY_URL:-}
+        VITE_REMOTE_CATALOG_URL: ${VITE_REMOTE_CATALOG_URL:-}
+        VITE_REMOTE_ENROLLMENT_URL: ${VITE_REMOTE_ENROLLMENT_URL:-}
+        VITE_REMOTE_BILLING_URL: ${VITE_REMOTE_BILLING_URL:-}
+        VITE_REMOTE_ADVISOR_URL: ${VITE_REMOTE_ADVISOR_URL:-}
+    image: qone-front:${IMAGE_TAG:-dev}
+    container_name: qone-front
+    restart: unless-stopped
+    expose:
+      - "80"
+    ports:
+      - "${FRONT_PORT:-5173}:80"
+    networks:
+      - platform
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+networks:
+  platform:
+    external: true

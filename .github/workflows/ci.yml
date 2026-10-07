@@ -31,3 +31,17 @@ jobs:
           if grep -rl "dev-sign-in" dist/assets; then
             echo "development sign-in found in a build for main" >&2; exit 1
           fi
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image with the default arguments (no development sign-in)
+        run: docker build -f deploy/Dockerfile -t qone-front:ci .
+      - name: Run it and smoke-check it
+        run: |
+          docker run -d --rm --name qone-front-ci -p 5173:80 qone-front:ci
+          for i in $(seq 1 20); do curl -fs http://localhost:5173/health && break; sleep 1; done
+          sh deploy/smoke.sh http://localhost:5173
+          docker stop qone-front-ci

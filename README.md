@@ -37,7 +37,17 @@ npm test                    # Vitest + Testing Library (+ MSW for integration)
 npm run build               # tsc -b && vite build -> dist/
 ```
 
-Container image and compose: `deploy/` (next increment).
+Container image and compose (`deploy/`, Annex H and G):
+
+```bash
+docker build -f deploy/Dockerfile -t qone-front:dev   --build-arg VITE_GATEWAY_URL=http://localhost:8080 --build-arg VITE_DEV_LOGIN=true .
+docker run --rm -p 5173:80 qone-front:dev          # http://localhost:5173
+deploy/smoke.sh http://localhost:5173              # health, SPA fallback, cache rules, no dev sign-in
+```
+
+`deploy/compose.yml` is what `qone-infra` includes: it builds the image with the environment's
+`VITE_*` variables, joins the external `platform` network and publishes `FRONT_PORT` (5173) only
+in `develop`. NGINX never caches `index.html` or `remoteEntry.js` and caches `/assets/` for a year.
 
 ## Dependencies
 
