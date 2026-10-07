@@ -68,7 +68,9 @@ const admin: User = {
 
 /** An unsigned development token for a user: header.payload.signature, RS256 claimed, 8 hours. */
 function devToken(user: User): string {
-  const b64 = (o: unknown) => btoa(JSON.stringify(o)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  // UTF-8 first, then base64url: names carry accents and btoa alone would emit latin1 bytes.
+  const b64 = (o: unknown) =>
+    btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   const now = Math.floor(Date.now() / 1000);
   const payload = { iss: "qone-identity-api", sub: user.id, role: user.role, name: user.name, iat: now, exp: now + 8 * 3600 };
   return `${b64({ alg: "RS256", typ: "JWT" })}.${b64(payload)}.bW9jay1zaWduYXR1cmU`;
