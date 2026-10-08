@@ -18,7 +18,7 @@ export async function loadPortalMocks(worker: MockWorker): Promise<PortalName[]>
   for (const portal of portals) {
     const entry = remoteEntryOf(portal.name);
     if (!entry) continue;
-    registerRemotes([{ name: portal.name, entry }]);
+    registerRemotes([{ name: portal.name, entry, type: "module" }]);
     try {
       const module = await loadRemote<{ default: HandlerFactory }>(`${portal.name}/mocks`);
       if (!module?.default) continue;

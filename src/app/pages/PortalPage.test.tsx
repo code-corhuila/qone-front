@@ -37,7 +37,7 @@ describe("PortalPage", () => {
     renderPortal("catalog");
 
     expect(await screen.findByText("catalog screens")).toBeInTheDocument();
-    expect(registerRemotes).toHaveBeenCalledWith([{ name: "catalog", entry: "http://localhost:5002/remoteEntry.js" }]);
+    expect(registerRemotes).toHaveBeenCalledWith([{ name: "catalog", entry: "http://localhost:5002/remoteEntry.js", type: "module" }]);
     expect(loadRemote).toHaveBeenCalledWith("catalog/App");
   });
 

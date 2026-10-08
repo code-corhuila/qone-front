@@ -15,7 +15,8 @@ function loadPortal(portal: PortalName): Promise<RemoteModule> {
   if (!entry) {
     return Promise.reject(new Error(`no remote entry configured for portal "${portal}" (VITE_REMOTE_${portal.toUpperCase()}_URL)`));
   }
-  registerRemotes([{ name: portal, entry }]);
+  // Vite remotes are ES modules: without `type: "module"` the runtime would load remoteEntry.js as a classic script.
+  registerRemotes([{ name: portal, entry, type: "module" }]);
   return loadRemote<RemoteModule>(`${portal}/App`).then((module) => {
     if (!module) throw new Error(`portal "${portal}" exposed nothing at ./App`);
     return module;

@@ -21,6 +21,8 @@ describe("loadPortalMocks", () => {
     registerRemotes.mockReset();
     worker.use.mockReset();
     vi.unstubAllEnvs();
+    // A developer's .env may configure remotes; the tests decide which portals exist.
+    for (const name of ["IDENTITY", "CATALOG", "ENROLLMENT", "BILLING", "ADVISOR"]) vi.stubEnv(`VITE_REMOTE_${name}_URL`, "");
   });
 
   it("registers each configured portal, asks for its mocks module and adds the handlers it builds", async () => {
@@ -32,8 +34,8 @@ describe("loadPortalMocks", () => {
 
     const loaded = await loadPortalMocks(worker);
 
-    expect(registerRemotes).toHaveBeenCalledWith([{ name: "catalog", entry: "http://localhost:5002/remoteEntry.js" }]);
-    expect(registerRemotes).toHaveBeenCalledWith([{ name: "billing", entry: "http://localhost:5004/remoteEntry.js" }]);
+    expect(registerRemotes).toHaveBeenCalledWith([{ name: "catalog", entry: "http://localhost:5002/remoteEntry.js", type: "module" }]);
+    expect(registerRemotes).toHaveBeenCalledWith([{ name: "billing", entry: "http://localhost:5004/remoteEntry.js", type: "module" }]);
     expect(factory).toHaveBeenCalledWith({ http, HttpResponse });
     expect(worker.use).toHaveBeenCalledWith(handler);
     expect(loaded).toEqual(["catalog"]);
