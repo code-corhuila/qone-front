@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { RequireAuth } from "../core/auth/RequireAuth";
-import { Shell } from "../layout/Shell";
+import { Shell, TERM } from "../layout/Shell";
 import { Home } from "./pages/Home";
 import { NotFound } from "./pages/NotFound";
 import { PortalPage } from "./pages/PortalPage";
@@ -16,14 +16,28 @@ export function App() {
         <Route
           path="/login/*"
           element={
-            <>
-              <header>
-                <h1>Qampus</h1>
-              </header>
-              <main>
-                <SignInPage />
+            <div className="auth">
+              <section className="auth-hero" aria-label="Qampus">
+                <div className="brand">
+                  <h1>Qampus</h1>
+                  <span className="chip">{TERM}</span>
+                </div>
+                <div>
+                  <p className="tagline">Your semester, in one place.</p>
+                  <p>
+                    Pensum, seats, schedules and payments that never contradict each other, and an advisor that
+                    answers from your real record and enrolls with you, never without you.
+                  </p>
+                </div>
+                <small>Quorum One · CORHUILA</small>
+              </section>
+              <main className="auth-panel">
+                <div className="content">
+                  <img className="institution" src="/brand/logo-corhuila.png" alt="CORHUILA" />
+                  <SignInPage />
+                </div>
               </main>
-            </>
+            </div>
           }
         />
         <Route element={<RequireAuth />}>
