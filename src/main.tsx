@@ -8,6 +8,7 @@ import "./styles/content.css";
 import "./styles/forms.css";
 import "./styles/chat.css";
 import "./styles/layout.css";
+import "./styles/auth.css";
 
 const container = document.getElementById("root");
 if (!container) {
