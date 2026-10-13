@@ -1,0 +1,187 @@
+/* The frame of the shell: the sidebar with the brand, the role's portals and the person, and the
+   home with one card per portal. The sign-in screen is in auth.css. */
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  /* The sidebar's colour runs to the bottom of long pages, past the sticky sidebar itself. */
+  background: linear-gradient(to right, var(--sidebar) 240px, var(--sidebar-border) 240px, var(--sidebar-border) 241px, transparent 241px);
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 240px;
+  height: 100vh;
+  flex-shrink: 0;
+  padding: 24px 14px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 20px;
+}
+
+.brand h1 {
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-list a {
+  display: block;
+  padding: 9px 10px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.nav-list a:hover {
+  text-decoration: none;
+  background: #e0e8e0;
+}
+
+.nav-list a.active {
+  color: var(--green);
+  background: var(--green-soft);
+  font-weight: 600;
+}
+
+.person {
+  margin-top: auto;
+  padding: 12px 10px;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.person strong {
+  display: block;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.link-button {
+  margin-top: 6px;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color: var(--green-dark);
+  text-decoration: underline;
+}
+
+.institution {
+  display: block;
+  width: 96px;
+  margin: 10px 10px 0;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 40px 48px;
+}
+
+.main > .content {
+  max-width: 1160px;
+}
+
+/* Home: one card per portal the person may open. */
+.home .lead {
+  margin: 4px 0 24px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 20px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.portal-card:hover {
+  text-decoration: none;
+  color: var(--ink);
+  border-color: var(--green);
+  box-shadow: var(--shadow);
+}
+
+.portal-card strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.portal-card span:not(.kicker) {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.portal-card .go {
+  margin-top: auto;
+  font-weight: 600;
+  color: var(--green) !important;
+}
+
+@media (max-width: 900px) {
+  .app {
+    flex-direction: column;
+    background: none;
+  }
+
+  .sidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 16px;
+  }
+
+  .nav-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .main {
+    padding: 24px 16px 40px;
+  }
+}
