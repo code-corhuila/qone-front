@@ -67,4 +67,36 @@ describe("Shell", () => {
 
     expect(session.isAuthenticated()).toBe(false);
   });
+
+  it("opens the menu from the top bar and closes it with Escape, giving the focus back", async () => {
+    const user = userEvent.setup();
+    renderShell(identityFixtures.laura);
+    const menu = screen.getByRole("button", { name: "Open menu" });
+    expect(menu).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(menu);
+    expect(screen.getByRole("button", { name: "Close menu" })).toHaveAttribute("aria-expanded", "true");
+
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveFocus();
+  });
+
+  it("closes the menu when a link is followed", async () => {
+    const user = userEvent.setup();
+    renderShell(identityFixtures.laura);
+
+    await user.click(screen.getByRole("button", { name: "Open menu" }));
+    await user.click(screen.getByRole("link", { name: "Catalog" }));
+
+    expect(screen.getByText("catalog content")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("offers a link to skip to the content", () => {
+    renderShell(identityFixtures.laura);
+
+    expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#content");
+    expect(screen.getByRole("main")).toHaveAttribute("id", "content");
+  });
 });

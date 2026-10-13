@@ -1,0 +1,360 @@
+/* The frame of the shell, mobile first: on a phone or tablet a top bar opens the sidebar as a
+   drawer over a backdrop; from 1024 px the sidebar is always on screen. Then the home with its
+   welcome and one card per portal. The sign-in screen is in auth.css. */
+
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 16px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--green);
+  border-radius: var(--radius);
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 12px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 0;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.icon-button:hover {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+/* Top bar (phone and tablet). */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 60px;
+  padding: 0 12px;
+  background: rgba(243, 246, 243, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-brand {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+/* Sidebar: a drawer below 1024 px. */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(300px, 86vw);
+  padding: 20px 14px 16px;
+  overflow-y: auto;
+  background: var(--sidebar);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: 0 10px 30px rgba(24, 28, 25, 0.18);
+  transform: translateX(-105%);
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0.25s;
+}
+
+.drawer-open .sidebar {
+  transform: none;
+  visibility: visible;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(20, 30, 24, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.drawer-open .backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 18px;
+}
+
+.brand h1 {
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-list a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-2);
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-list a svg {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.nav-list a:hover {
+  text-decoration: none;
+  color: var(--ink);
+  background: #e0e8e0;
+}
+
+.nav-list a.active {
+  font-weight: 600;
+  color: var(--green);
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(24, 28, 25, 0.08), inset 0 0 0 1px var(--green-border);
+}
+
+.nav-list a.active svg {
+  color: var(--green);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 10px 4px 10px 10px;
+  background: var(--card);
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: 999px;
+}
+
+.person-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.person-text strong {
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.institution {
+  display: block;
+  width: 72px;
+  height: auto;
+  margin: 14px 10px 0;
+}
+
+.main {
+  min-width: 0;
+  padding: 22px 16px 48px;
+}
+
+.main:focus {
+  outline: none;
+}
+
+.main > .content {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .main {
+    padding: 28px 28px 56px;
+  }
+}
+
+/* Desktop: the sidebar is part of the page. */
+@media (min-width: 1024px) {
+  .app {
+    display: grid;
+    grid-template-columns: 256px minmax(0, 1fr);
+    min-height: 100vh;
+    /* The sidebar's colour runs to the bottom of long pages, past the sticky sidebar itself. */
+    background: linear-gradient(to right, var(--sidebar) 255px, var(--sidebar-border) 255px, var(--sidebar-border) 256px, transparent 256px);
+  }
+
+  .topbar,
+  .backdrop {
+    display: none;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: auto;
+    width: auto;
+    height: 100vh;
+    padding: 24px 14px 18px;
+    box-shadow: none;
+    transform: none;
+    visibility: visible;
+    transition: none;
+  }
+
+  .main {
+    padding: 36px 44px 64px;
+  }
+}
+
+/* Home. */
+.welcome {
+  margin-bottom: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--green-soft), var(--card));
+  border: 1px solid var(--green-border);
+  border-radius: 16px;
+}
+
+.welcome h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.welcome .lead {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  padding: 20px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.portal-card:hover {
+  text-decoration: none;
+  color: var(--ink);
+  border-color: var(--green-border);
+  box-shadow: 0 10px 24px rgba(24, 28, 25, 0.08);
+  transform: translateY(-2px);
+}
+
+.portal-card .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: 12px;
+}
+
+.portal-card strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.portal-card .what {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.portal-card .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .portal-card:hover {
+    transform: none;
+  }
+}

@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router";
+import userEvent from "@testing-library/user-event";
+import { Link, MemoryRouter, Route, Routes } from "react-router";
 
 const loadRemote = vi.fn();
 const registerRemotes = vi.fn();
@@ -61,5 +62,28 @@ describe("PortalPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("The billing portal is not available right now.");
     expect(loadRemote).not.toHaveBeenCalled();
     spy.mockRestore();
+  });
+
+  it("switches straight from one portal to another when a link is followed", async () => {
+    const user = userEvent.setup();
+    vi.stubEnv("VITE_REMOTE_CATALOG_URL", "http://localhost:5002/remoteEntry.js");
+    vi.stubEnv("VITE_REMOTE_BILLING_URL", "http://localhost:5004/remoteEntry.js");
+    loadRemote.mockImplementation((id: string) => new Promise((resolve) => setTimeout(() => resolve({ default: () => <p>{id} screens</p> }), 50)));
+
+    render(
+      <MemoryRouter initialEntries={["/catalog"]}>
+        <Link to="/billing">Billing</Link>
+        <Routes>
+          <Route path="/catalog/*" element={<PortalPage portal="catalog" />} />
+          <Route path="/billing/*" element={<PortalPage portal="billing" />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText("catalog/App screens")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("link", { name: "Billing" }));
+
+    expect(await screen.findByText("billing/App screens")).toBeInTheDocument();
+    expect(screen.queryByText("catalog/App screens")).not.toBeInTheDocument();
   });
 });
