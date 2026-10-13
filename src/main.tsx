@@ -7,6 +7,7 @@ import "./styles/theme.css";
 import "./styles/content.css";
 import "./styles/forms.css";
 import "./styles/chat.css";
+import "./styles/layout.css";
 
 const container = document.getElementById("root");
 if (!container) {
