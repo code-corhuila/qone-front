@@ -175,3 +175,45 @@
   padding-left: 18px;
 }
 
+
+/* Phones: one line of tabs that scrolls sideways, and tables that scroll inside their card instead
+   of widening the page. */
+@media (max-width: 767px) {
+  .content h2 {
+    font-size: 24px;
+  }
+
+  .content nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .content nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    white-space: nowrap;
+  }
+
+  .content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .content thead th,
+  .content tbody th,
+  .content tbody td:first-child {
+    white-space: nowrap;
+  }
+
+  .content dl {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .content dd + dt {
+    margin-top: 10px;
+  }
+}
