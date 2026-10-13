@@ -5,6 +5,8 @@ import { config } from "./core/config";
 import { session } from "./core/auth/session";
 import "./styles/theme.css";
 import "./styles/content.css";
+import "./styles/forms.css";
+import "./styles/chat.css";
 
 const container = document.getElementById("root");
 if (!container) {
