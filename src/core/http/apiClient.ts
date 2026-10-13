@@ -2,7 +2,8 @@
 // `shell/apiClient`. It is the only code that knows the gateway origin, attaches the token,
 // generates one X-Correlation-Id per request, enforces the per-request timeout, ends the
 // session on 401 and turns every failure into an ApiError whose message was decided in one
-// place (errors.ts). Portals pass relative paths such as `/api/v1/catalog/subjects`.
+// place (errors.ts). `download` returns binaries (the certificate PDF) the same way. Portals
+// pass relative paths such as `/api/v1/catalog/subjects`.
 
 import { config } from "../config";
 import { session } from "../auth/session";
@@ -22,6 +23,20 @@ export interface RequestOptions {
 }
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+/** A binary answer (a certificate's PDF, EN-14) with the headers a view may show. */
+export interface Download {
+  blob: Blob;
+  contentType: string;
+  /** The file name of Content-Disposition, when the service gives one. */
+  filename?: string;
+  headers: Headers;
+}
+
+function filenameOf(disposition: string | null): string | undefined {
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition ?? "");
+  return match?.[1] ? decodeURIComponent(match[1]) : undefined;
+}
 
 function newCorrelationId(): string {
   return crypto.randomUUID();
@@ -49,9 +64,9 @@ async function parseBody(response: Response): Promise<unknown> {
   }
 }
 
-async function request<T>(method: Method, path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+async function request<T>(method: Method, path: string, body?: unknown, options: RequestOptions = {}, accept = "application/json"): Promise<T> {
   const correlationId = newCorrelationId();
-  const headers = new Headers({ Accept: "application/json", "X-Correlation-Id": correlationId });
+  const headers = new Headers({ Accept: accept, "X-Correlation-Id": correlationId });
   const token = session.token();
   if (token) headers.set("Authorization", `Bearer ${token}`);
   if (body !== undefined) headers.set("Content-Type", "application/json");
@@ -78,6 +93,15 @@ async function request<T>(method: Method, path: string, body?: unknown, options:
     clearTimeout(timeout);
   }
 
+  if (response.ok && accept !== "application/json") {
+    const download: Download = {
+      blob: await response.blob(),
+      contentType: response.headers.get("Content-Type") ?? accept,
+      headers: response.headers,
+      ...(filenameOf(response.headers.get("Content-Disposition")) ? { filename: filenameOf(response.headers.get("Content-Disposition"))! } : {}),
+    };
+    return download as T;
+  }
   const parsed = await parseBody(response);
   if (response.ok) return parsed as T;
 
@@ -92,6 +116,9 @@ export const apiClient = {
   put: <T>(path: string, body?: unknown, options?: RequestOptions) => request<T>("PUT", path, body, options),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) => request<T>("PATCH", path, body, options),
   del: <T = undefined>(path: string, options?: RequestOptions) => request<T>("DELETE", path, undefined, options),
+  /** GET of a binary resource (`Accept` defaults to PDF); errors still come as the JSON envelope. */
+  download: (path: string, options?: RequestOptions & { accept?: string }) =>
+    request<Download>("GET", path, undefined, options, options?.accept ?? "application/pdf"),
 };
 
 export type ApiClient = typeof apiClient;
