@@ -124,3 +124,39 @@ describe("apiClient - what the container does for every portal (Annex H)", () =>
     expect(error.traceId).toMatch(/^[0-9a-f-]{36}$/);
   });
 });
+
+describe("apiClient.download - binaries such as the certificate PDF (EN-14)", () => {
+  it("asks for a PDF with the token and returns the bytes, the type and the file name", async () => {
+    let seen: { accept: string | null; auth: string | null } | undefined;
+    server.use(
+      http.get(`${GATEWAY}/api/v1/enrollment/certificates/c-1/pdf`, ({ request }) => {
+        seen = { accept: request.headers.get("accept"), auth: request.headers.get("authorization") };
+        return new HttpResponse(new Uint8Array([37, 80, 68, 70]), {
+          headers: { "Content-Type": "application/pdf", "Content-Disposition": 'attachment; filename="QMP-ABCD1234.pdf"', "X-Verification-Code": "QMP-ABCD1234" },
+        });
+      }),
+    );
+    const token = signedToken();
+    session.signIn(token);
+
+    const file = await apiClient.download("/api/v1/enrollment/certificates/c-1/pdf");
+
+    expect(seen).toEqual({ accept: "application/pdf", auth: `Bearer ${token}` });
+    expect(file.contentType).toBe("application/pdf");
+    expect(file.filename).toBe("QMP-ABCD1234.pdf");
+    expect(file.headers.get("X-Verification-Code")).toBe("QMP-ABCD1234");
+    expect(new Uint8Array(await file.blob.arrayBuffer())).toEqual(new Uint8Array([37, 80, 68, 70]));
+  });
+
+  it("turns a JSON error envelope into the same ApiError as any other call", async () => {
+    server.use(
+      http.get(`${GATEWAY}/api/v1/enrollment/certificates/c-2/pdf`, () =>
+        HttpResponse.json({ error: "NOT_FOUND", message: "resource not found", traceId: "t-404" }, { status: 404 }),
+      ),
+    );
+    session.signIn(signedToken());
+    const failure = await apiClient.download("/api/v1/enrollment/certificates/c-2/pdf").catch((e: unknown) => e);
+    expect(failure).toBeInstanceOf(ApiError);
+    expect(failure).toMatchObject({ status: 404, code: "NOT_FOUND", traceId: "t-404" });
+  });
+});
