@@ -110,16 +110,29 @@
   max-width: 1160px;
 }
 
-/* Home: one card per portal the person may open. */
-.home .lead {
-  margin: 4px 0 24px;
-  font-size: 14px;
-  color: var(--muted);
+/* Home. */
+.welcome {
+  margin-bottom: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--green-soft), var(--card));
+  border: 1px solid var(--green-border);
+  border-radius: 16px;
+}
+
+.welcome h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.welcome .lead {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--text-2);
 }
 
 .portal-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
   gap: 16px;
   margin: 0;
   padding: 0;
@@ -129,21 +142,34 @@
 .portal-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   height: 100%;
   padding: 20px;
   color: var(--ink);
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .portal-card:hover {
   text-decoration: none;
   color: var(--ink);
-  border-color: var(--green);
-  box-shadow: var(--shadow);
+  border-color: var(--green-border);
+  box-shadow: 0 10px 24px rgba(24, 28, 25, 0.08);
+  transform: translateY(-2px);
+}
+
+.portal-card .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: 12px;
 }
 
 .portal-card strong {
@@ -152,15 +178,33 @@
   font-weight: 500;
 }
 
-.portal-card span:not(.kicker) {
+.portal-card .what {
   font-size: 14px;
   color: var(--muted);
 }
 
 .portal-card .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-top: auto;
+  padding-top: 8px;
   font-weight: 600;
-  color: var(--green) !important;
+  color: var(--green);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .portal-card:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {
