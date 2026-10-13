@@ -1,0 +1,177 @@
+/* What a portal renders, styled by the shell (Annex H: portals own their screens, the shell owns
+   the look). Portals write semantic HTML (sections, nav, tables, forms, dl, alerts with roles), so
+   these rules target elements inside `.content`, the area where every portal is mounted, and the
+   few class names a portal needs for its own layout (the advisor's chat). */
+
+.content h2 {
+  font-size: 30px;
+  margin: 0 0 4px;
+}
+
+.content h3 {
+  font-size: 20px;
+  margin: 24px 0 12px;
+}
+
+.content h4 {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.content p {
+  color: var(--text-2);
+  margin: 8px 0;
+}
+
+/* The navigation of a portal: tabs on a soft track. React Router marks the current link "active". */
+.content nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 14px 0 22px;
+  padding: 4px;
+  background: var(--track);
+  border-radius: 999px;
+}
+
+.content nav a {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.content nav a:hover {
+  text-decoration: none;
+  background: #d9e3da;
+}
+
+.content nav a.active {
+  color: var(--green);
+  background: var(--card);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+/* Tables: a white card with a quiet header, one line per row. */
+.content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+
+.content caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.content thead th {
+  text-align: left;
+  padding: 11px 14px;
+  background: #f7faf7;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.content tbody th,
+.content tbody td {
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--row);
+  vertical-align: middle;
+}
+
+.content tbody th {
+  font-weight: 600;
+}
+
+.content tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+.content tbody tr:hover {
+  background: #f8fbf8;
+}
+
+/* Name and value pairs (an invoice, a plan): a card with two columns. */
+.content dl {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) 1fr;
+  gap: 8px 20px;
+  max-width: 640px;
+  margin: 12px 0 16px;
+  padding: 18px 20px;
+  font-size: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.content dt {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.content dd {
+  margin: 0;
+}
+
+/* Feedback: an error with its reference, a status or a confirmation. */
+.content [role="alert"] {
+  margin: 12px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--error);
+  background: var(--error-bg);
+  border-radius: var(--radius);
+}
+
+.content [role="status"] {
+  margin: 12px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: var(--radius);
+}
+
+.content [role="alert"] p,
+.content [role="status"] p {
+  margin: 2px 0;
+  color: inherit;
+}
+
+.content [role="alert"] button {
+  margin-top: 8px;
+}
+
+.content [aria-busy="true"] {
+  color: var(--muted);
+}
+
+.content td ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
