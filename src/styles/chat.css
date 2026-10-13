@@ -1,0 +1,109 @@
+/* The advisor portal's own layout (it is the only portal with class names): conversations on the
+   left, the chat as bubbles, the proposed plan as a card. */
+
+.content .advisor {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.content .advisor > [role="status"] {
+  grid-column: 1 / -1;
+}
+
+.content .advisor aside {
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.content .advisor aside ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.content .advisor aside a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.content .advisor aside a.active {
+  color: var(--green);
+  background: var(--green-soft);
+  font-weight: 600;
+}
+
+.content .messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.content .messages > li {
+  max-width: 80%;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.content .messages > li strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.content .messages > li > p {
+  margin: 0;
+  color: inherit;
+  white-space: pre-wrap;
+}
+
+.content .messages .from-you {
+  align-self: flex-end;
+  color: #f3f6f3;
+  background: var(--green);
+  border-color: var(--green);
+  border-top-right-radius: 4px;
+}
+
+.content .messages .from-advisor {
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+}
+
+.content .plan-card {
+  margin-top: 12px;
+  padding: 16px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--green);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.content .plan-card dl {
+  margin: 8px 0;
+  padding: 0;
+  border: none;
+}
+
+@media (max-width: 900px) {
+  .content .advisor {
+    grid-template-columns: 1fr;
+  }
+
+  .content .messages > li {
+    max-width: 100%;
+  }
+}
