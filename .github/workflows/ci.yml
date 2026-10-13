@@ -1,0 +1,47 @@
+name: CI
+on:
+  pull_request:
+    branches: [develop, qa, main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type check (TypeScript strict)
+        run: npm run typecheck
+      - name: Unit, component and integration tests
+        run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          VITE_GATEWAY_URL: http://gateway.invalid
+          VITE_DEV_LOGIN: "false"
+      - name: The main build must not ship the development sign-in (norm 5.5.2)
+        if: github.base_ref == 'main'
+        run: |
+          if grep -rl "dev-sign-in" dist/assets; then
+            echo "development sign-in found in a build for main" >&2; exit 1
+          fi
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image with the default arguments (no development sign-in)
+        run: docker build -f deploy/Dockerfile -t qone-front:ci .
+      - name: Run it and smoke-check it
+        run: |
+          docker run -d --rm --name qone-front-ci -p 5173:80 qone-front:ci
+          for i in $(seq 1 20); do curl -fs http://localhost:5173/health && break; sleep 1; done
+          sh deploy/smoke.sh http://localhost:5173
+          docker stop qone-front-ci
