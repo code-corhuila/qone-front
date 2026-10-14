@@ -28,8 +28,13 @@ export function PortalPage({ portal }: { portal: PortalName }) {
   // A new lazy component per attempt, so a retry downloads the remote again instead of reusing the failure.
   const Remote = useMemo(() => lazy(() => loadPortal(portal)), [portal, attempt]);
 
+  // Keyed by portal: every portal route renders this same component in the same place, so going
+  // straight from one portal to another would reuse the instance. Router navigations run in a
+  // transition, where React keeps an already shown boundary on screen and throws away the render
+  // that suspended, memo included, so a fresh lazy came back on every retry and the new portal
+  // never appeared. A new boundary per portal shows its fallback and commits.
   return (
-    <RemoteBoundary portal={portal} onRetry={() => setAttempt((n) => n + 1)}>
+    <RemoteBoundary key={portal} portal={portal} onRetry={() => setAttempt((n) => n + 1)}>
       <Suspense fallback={<p aria-busy="true">Loading the {portal} portal...</p>}>
         <Remote />
       </Suspense>
