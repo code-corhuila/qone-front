@@ -44,13 +44,13 @@ describe("session", () => {
   });
 
   it("signs in from a token, exposes the user and persists across a reload", () => {
-    const t = token({ sub: "u-1", role: "PROFESSOR", name: "Profesor Demo 01", exp: future });
+    const t = token({ sub: "u-1", role: "PROFESSOR", name: "Profesor Prueba 04", exp: future });
     const result = session.signIn(t);
 
     expect(result.ok).toBe(true);
     expect(session.isAuthenticated()).toBe(true);
     expect(session.token()).toBe(t);
-    expect(session.user()).toEqual({ id: "u-1", role: "PROFESSOR", name: "Profesor Demo 01" });
+    expect(session.user()).toEqual({ id: "u-1", role: "PROFESSOR", name: "Profesor Prueba 04" });
     expect(localStorage.getItem("qampus.session")).toBe(t);
 
     session.restore();
