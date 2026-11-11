@@ -1,4 +1,4 @@
-import { ApiError, messageFor } from "./errors";
+import { ApiError, messageFor, retryAfterSeconds } from "./errors";
 
 // The one place that decides what a person reads for each HTTP status (norm 5.5, Annex H).
 describe("messageFor", () => {
@@ -60,5 +60,32 @@ describe("ApiError", () => {
     expect(error.code).toBe("INTERNAL_ERROR");
     expect(error.traceId).toBe("corr-9");
     expect(error.message).toBe("Something went wrong on our side. Try again later.");
+  });
+});
+
+// RFC 9110: Retry-After is delay-seconds or an HTTP-date; a 429 of the advisor quota sends seconds (#53).
+describe("retryAfterSeconds", () => {
+  it("reads delay-seconds", () => {
+    expect(retryAfterSeconds("1200")).toBe(1200);
+    expect(retryAfterSeconds(" 0 ")).toBe(0);
+  });
+
+  it("turns an HTTP-date into the seconds left, never negative", () => {
+    const now = Date.parse("2026-11-11T10:00:00Z");
+    expect(retryAfterSeconds("Wed, 11 Nov 2026 10:02:30 GMT", now)).toBe(150);
+    expect(retryAfterSeconds("Wed, 11 Nov 2026 09:00:00 GMT", now)).toBe(0);
+  });
+
+  it("is undefined when the header is absent or unreadable", () => {
+    expect(retryAfterSeconds(null)).toBeUndefined();
+    expect(retryAfterSeconds("")).toBeUndefined();
+    expect(retryAfterSeconds("soon")).toBeUndefined();
+    expect(retryAfterSeconds("-5")).toBeUndefined();
+  });
+
+  it("travels in the ApiError built from the envelope", () => {
+    const error = ApiError.fromEnvelope(429, { error: "TOO_MANY_REQUESTS", message: "quota", traceId: "t" }, "", 60);
+    expect(error.retryAfterSeconds).toBe(60);
+    expect(ApiError.fromEnvelope(422, { error: "BUSINESS_RULE_VIOLATION", message: "x", traceId: "t" }).retryAfterSeconds).toBeUndefined();
   });
 });

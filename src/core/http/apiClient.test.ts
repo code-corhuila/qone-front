@@ -85,6 +85,24 @@ describe("apiClient - what the container does for every portal (Annex H)", () =>
     expect(error.message).toBe("A rule of the university prevents this action.");
   });
 
+  it("gives the seconds of Retry-After with a 429, so a view can say when to try again (#53)", async () => {
+    server.use(
+      http.post(`${GATEWAY}/api/v1/advisor/conversations/c1/messages`, () =>
+        HttpResponse.json(
+          { error: "TOO_MANY_REQUESTS", message: "message quota reached", traceId: "trace-429" },
+          { status: 429, headers: { "Retry-After": "1200" } },
+        ),
+      ),
+    );
+
+    const error = (await apiClient.post("/api/v1/advisor/conversations/c1/messages", { content: "hola" }, { idempotencyKey: "msg-0001-abcd" }).catch((e: unknown) => e)) as ApiError;
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error.status).toBe(429);
+    expect(error.code).toBe("TOO_MANY_REQUESTS");
+    expect(error.retryAfterSeconds).toBe(1200);
+  });
+
   it("ends the session on any 401 (norm 5.5) and still throws", async () => {
     server.use(http.get(`${GATEWAY}/api/v1/catalog/subjects`, () => HttpResponse.json({ error: "UNAUTHORIZED", message: "token expired", traceId: "t" }, { status: 401 })));
     session.signIn(signedToken());

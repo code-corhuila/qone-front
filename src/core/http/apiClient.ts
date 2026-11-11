@@ -7,7 +7,7 @@
 
 import { config } from "../config";
 import { session } from "../auth/session";
-import { ApiError } from "./errors";
+import { ApiError, retryAfterSeconds } from "./errors";
 
 export const DEFAULT_TIMEOUT_MS = 10_000;
 
@@ -105,7 +105,12 @@ async function request<T>(method: Method, path: string, body?: unknown, options:
   const parsed = await parseBody(response);
   if (response.ok) return parsed as T;
 
-  const error = ApiError.fromEnvelope(response.status, parsed, response.headers.get("X-Correlation-Id") ?? correlationId);
+  const error = ApiError.fromEnvelope(
+    response.status,
+    parsed,
+    response.headers.get("X-Correlation-Id") ?? correlationId,
+    retryAfterSeconds(response.headers.get("Retry-After")),
+  );
   if (response.status === 401) session.clear();
   throw error;
 }
