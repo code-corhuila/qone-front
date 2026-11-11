@@ -49,6 +49,20 @@ export function messageFor(status: number, code: string): string {
   return MESSAGES[code] ?? GENERIC;
 }
 
+/**
+ * Seconds a client should wait, from a Retry-After header (RFC 9110: delay-seconds or an
+ * HTTP-date). Undefined when the header is absent or unreadable. The advisor's message quota
+ * answers 429 with seconds (#53), so a view can say when the person may try again.
+ */
+export function retryAfterSeconds(header: string | null, now = Date.now()): number | undefined {
+  const value = header?.trim();
+  if (!value) return undefined;
+  if (/^\d+$/.test(value)) return Number(value);
+  const at = Date.parse(value);
+  if (Number.isNaN(at) || !/[a-z]/i.test(value)) return undefined;
+  return Math.max(0, Math.ceil((at - now) / 1000));
+}
+
 function isEnvelope(body: unknown): body is ErrorEnvelope {
   return typeof body === "object" && body !== null && typeof (body as ErrorEnvelope).error === "string" && typeof (body as ErrorEnvelope).message === "string";
 }
@@ -59,8 +73,10 @@ export class ApiError extends Error {
   readonly traceId: string;
   readonly serverMessage: string;
   readonly details: ErrorDetail[];
+  /** From Retry-After (a 429 or a 503 may send it); undefined when the service gave none. */
+  readonly retryAfterSeconds: number | undefined;
 
-  constructor(status: number, code: string, traceId: string, serverMessage: string, details: ErrorDetail[] = []) {
+  constructor(status: number, code: string, traceId: string, serverMessage: string, details: ErrorDetail[] = [], retryAfter?: number) {
     super(messageFor(status, code));
     this.name = "ApiError";
     this.status = status;
@@ -68,14 +84,15 @@ export class ApiError extends Error {
     this.traceId = traceId;
     this.serverMessage = serverMessage;
     this.details = details;
+    this.retryAfterSeconds = retryAfter;
   }
 
   /** Builds the error from a response body; a body that is not the envelope becomes INTERNAL_ERROR with the request's correlation id. */
-  static fromEnvelope(status: number, body: unknown, correlationId = ""): ApiError {
+  static fromEnvelope(status: number, body: unknown, correlationId = "", retryAfter?: number): ApiError {
     if (isEnvelope(body)) {
-      return new ApiError(status, body.error, body.traceId || correlationId, body.message, body.details ?? []);
+      return new ApiError(status, body.error, body.traceId || correlationId, body.message, body.details ?? [], retryAfter);
     }
-    return new ApiError(status, "INTERNAL_ERROR", correlationId, "");
+    return new ApiError(status, "INTERNAL_ERROR", correlationId, "", [], retryAfter);
   }
 
   /** The server's message for one field of a validation error, to render beside that field (Annex H). */
