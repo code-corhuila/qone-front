@@ -10,10 +10,10 @@ import { ApiError } from "./errors";
 
 const GATEWAY = "http://gateway.test";
 
-function signedToken(sub = identityFixtures.laura.id): string {
+function signedToken(sub = identityFixtures.student01.id): string {
   const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
   const exp = Math.floor(Date.now() / 1000) + 3600;
-  return `${b64({ alg: "RS256", typ: "JWT" })}.${b64({ sub, role: "STUDENT", name: "Laura Gómez", exp })}.c2ln`;
+  return `${b64({ alg: "RS256", typ: "JWT" })}.${b64({ sub, role: "STUDENT", name: "Estudiante Demo 01", exp })}.c2ln`;
 }
 
 beforeEach(() => {
@@ -30,7 +30,7 @@ describe("apiClient - what the container does for every portal (Annex H)", () =>
           correlation: request.headers.get("x-correlation-id"),
           accept: request.headers.get("accept"),
         });
-        return HttpResponse.json(identityFixtures.laura);
+        return HttpResponse.json(identityFixtures.student01);
       }),
     );
     const token = signedToken();
@@ -39,8 +39,8 @@ describe("apiClient - what the container does for every portal (Annex H)", () =>
     const first = await apiClient.get<{ id: string }>("/api/v1/identity/users/me");
     const second = await apiClient.get<{ id: string }>("/api/v1/identity/users/me");
 
-    expect(first.id).toBe(identityFixtures.laura.id);
-    expect(second.id).toBe(identityFixtures.laura.id);
+    expect(first.id).toBe(identityFixtures.student01.id);
+    expect(second.id).toBe(identityFixtures.student01.id);
     expect(seen).toHaveLength(2);
     expect(seen[0]?.auth).toBe(`Bearer ${token}`);
     expect(seen[0]?.accept).toBe("application/json");
@@ -53,7 +53,7 @@ describe("apiClient - what the container does for every portal (Annex H)", () =>
     server.use(
       http.post(`${GATEWAY}/api/v1/identity/auth/register`, async ({ request }) => {
         received = { auth: request.headers.get("authorization"), key: request.headers.get("idempotency-key"), body: await request.json() };
-        return HttpResponse.json(identityFixtures.authResponse(identityFixtures.laura), { status: 201, headers: { Location: "/api/v1/identity/users/x" } });
+        return HttpResponse.json(identityFixtures.authResponse(identityFixtures.student01), { status: 201, headers: { Location: "/api/v1/identity/users/x" } });
       }),
     );
 
@@ -83,6 +83,24 @@ describe("apiClient - what the container does for every portal (Annex H)", () =>
     expect(error.code).toBe("BUSINESS_RULE_VIOLATION");
     expect(error.traceId).toBe("trace-42");
     expect(error.message).toBe("A rule of the university prevents this action.");
+  });
+
+  it("gives the seconds of Retry-After with a 429, so a view can say when to try again (#53)", async () => {
+    server.use(
+      http.post(`${GATEWAY}/api/v1/advisor/conversations/c1/messages`, () =>
+        HttpResponse.json(
+          { error: "TOO_MANY_REQUESTS", message: "message quota reached", traceId: "trace-429" },
+          { status: 429, headers: { "Retry-After": "1200" } },
+        ),
+      ),
+    );
+
+    const error = (await apiClient.post("/api/v1/advisor/conversations/c1/messages", { content: "hola" }, { idempotencyKey: "msg-0001-abcd" }).catch((e: unknown) => e)) as ApiError;
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error.status).toBe(429);
+    expect(error.code).toBe("TOO_MANY_REQUESTS");
+    expect(error.retryAfterSeconds).toBe(1200);
   });
 
   it("ends the session on any 401 (norm 5.5) and still throws", async () => {

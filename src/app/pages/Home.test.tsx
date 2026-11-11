@@ -12,14 +12,14 @@ beforeEach(() => {
 // The home greets the person by first name and offers one card per portal of their role.
 describe("Home", () => {
   it("greets a student and links one card per portal", () => {
-    session.signIn(identityFixtures.devToken(identityFixtures.laura));
+    session.signIn(identityFixtures.devToken(identityFixtures.student01));
     render(
       <MemoryRouter>
         <Home />
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("heading", { level: 2, name: "Hello, Laura" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Hello, Estudiante" })).toBeInTheDocument();
     expect(screen.getByText("Student · Term 2026-B")).toBeInTheDocument();
     const cards = within(screen.getByRole("list")).getAllByRole("link");
     expect(cards.map((c) => c.getAttribute("href"))).toEqual(["/catalog", "/enrollment", "/billing", "/advisor"]);

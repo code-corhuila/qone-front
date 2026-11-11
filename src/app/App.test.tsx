@@ -24,15 +24,15 @@ describe("App shell", () => {
   });
 
   it("greets a signed-in person on the home route, inside the layout with navigation", () => {
-    session.signIn(identityFixtures.devToken(identityFixtures.carlos));
+    session.signIn(identityFixtures.devToken(identityFixtures.professor01));
     render(<App />);
 
-    expect(screen.getByText("Carlos Ramírez")).toBeInTheDocument();
+    expect(screen.getByText("Profesor Demo 01")).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "Main" })).toBeInTheDocument();
   });
 
   it("answers an unknown route with the 404 page (Annex H)", () => {
-    session.signIn(identityFixtures.devToken(identityFixtures.laura));
+    session.signIn(identityFixtures.devToken(identityFixtures.student01));
     window.history.replaceState(null, "", "/does-not-exist");
     render(<App />);
 

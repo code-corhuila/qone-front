@@ -29,17 +29,17 @@ beforeEach(() => {
 // (07-api/authentication.md, access matrix); the person and the sign-out are always visible.
 describe("Shell", () => {
   it("shows brand, the signed-in person, the navigation for a student and the page content", () => {
-    renderShell(identityFixtures.laura);
+    renderShell(identityFixtures.student01);
 
     expect(screen.getByRole("heading", { level: 1, name: "Qampus" })).toBeInTheDocument();
-    expect(screen.getByText("Laura Gómez")).toBeInTheDocument();
+    expect(screen.getByText("Estudiante Demo 01")).toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "Main" });
     expect(within(nav).getAllByRole("link").map((l) => l.textContent)).toEqual(["Home", "Catalog", "Enrollment", "Billing", "Advisor"]);
     expect(within(screen.getByRole("main")).getByText("home content")).toBeInTheDocument();
   });
 
   it("gives a professor catalog, enrollment and advisor, and an admin catalog and billing", () => {
-    const { unmount } = renderShell(identityFixtures.carlos);
+    const { unmount } = renderShell(identityFixtures.professor01);
     let nav = screen.getByRole("navigation", { name: "Main" });
     expect(within(nav).getAllByRole("link").map((l) => l.textContent)).toEqual(["Home", "Catalog", "Enrollment", "Advisor"]);
     unmount();
@@ -52,7 +52,7 @@ describe("Shell", () => {
 
   it("marks the current section and routes the links", async () => {
     const user = userEvent.setup();
-    renderShell(identityFixtures.laura, "/catalog/subjects");
+    renderShell(identityFixtures.student01, "/catalog/subjects");
 
     expect(screen.getByRole("link", { name: "Catalog" })).toHaveAttribute("aria-current", "page");
     await user.click(screen.getByRole("link", { name: "Home" }));
@@ -61,7 +61,7 @@ describe("Shell", () => {
 
   it("signs out from the header", async () => {
     const user = userEvent.setup();
-    renderShell(identityFixtures.laura);
+    renderShell(identityFixtures.student01);
 
     await user.click(screen.getByRole("button", { name: "Sign out" }));
 
@@ -70,7 +70,7 @@ describe("Shell", () => {
 
   it("opens the menu from the top bar and closes it with Escape, giving the focus back", async () => {
     const user = userEvent.setup();
-    renderShell(identityFixtures.laura);
+    renderShell(identityFixtures.student01);
     const menu = screen.getByRole("button", { name: "Open menu" });
     expect(menu).toHaveAttribute("aria-expanded", "false");
 
@@ -84,7 +84,7 @@ describe("Shell", () => {
 
   it("closes the menu when a link is followed", async () => {
     const user = userEvent.setup();
-    renderShell(identityFixtures.laura);
+    renderShell(identityFixtures.student01);
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
     await user.click(screen.getByRole("link", { name: "Catalog" }));
@@ -94,7 +94,7 @@ describe("Shell", () => {
   });
 
   it("offers a link to skip to the content", () => {
-    renderShell(identityFixtures.laura);
+    renderShell(identityFixtures.student01);
 
     expect(screen.getByRole("link", { name: "Skip to content" })).toHaveAttribute("href", "#content");
     expect(screen.getByRole("main")).toHaveAttribute("id", "content");

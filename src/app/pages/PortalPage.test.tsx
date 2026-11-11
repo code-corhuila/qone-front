@@ -57,6 +57,8 @@ describe("PortalPage", () => {
 
   it("shows the unavailable message when the shell has no entry for the portal", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    // Empty on purpose: a developer's .env usually has the billing entry, and the test must not depend on it.
+    vi.stubEnv("VITE_REMOTE_BILLING_URL", "");
     renderPortal("billing");
 
     expect(await screen.findByRole("alert")).toHaveTextContent("The billing portal is not available right now.");
