@@ -18,6 +18,13 @@ function renderLogin(from?: string) {
   );
 }
 
+// A JWT is pasted, as a person does: typing hundreds of characters one key at a time took
+// seconds per test and timed out on a busy machine.
+async function pasteToken(user: ReturnType<typeof userEvent.setup>, token: string) {
+  await user.click(screen.getByLabelText("Development token"));
+  await user.paste(token);
+}
+
 beforeEach(() => {
   session.clear();
   localStorage.clear();
@@ -55,7 +62,7 @@ describe("DevSignIn", () => {
     const b64 = (o: unknown) => btoa(JSON.stringify(o)).replace(/=+$/, "");
     const expired = `${b64({ alg: "RS256" })}.${b64({ sub: "u", exp: 1 })}.sig`;
 
-    await user.type(screen.getByLabelText("Development token"), expired);
+    await pasteToken(user, expired);
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(screen.getByText("This token has expired. Mint a new one with dev-token.sh.")).toBeInTheDocument();
@@ -66,7 +73,7 @@ describe("DevSignIn", () => {
     const user = userEvent.setup();
     renderLogin("/billing");
 
-    await user.type(screen.getByLabelText("Development token"), identityFixtures.devToken(identityFixtures.santiago));
+    await pasteToken(user, identityFixtures.devToken(identityFixtures.santiago));
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(session.user()?.name).toBe("Santiago Rojas");
@@ -77,7 +84,7 @@ describe("DevSignIn", () => {
     const user = userEvent.setup();
     renderLogin();
 
-    await user.type(screen.getByLabelText("Development token"), identityFixtures.devToken(identityFixtures.laura));
+    await pasteToken(user, identityFixtures.devToken(identityFixtures.laura));
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(screen.getByText("home")).toBeInTheDocument();
