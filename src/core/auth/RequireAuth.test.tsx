@@ -36,13 +36,13 @@ describe("RequireAuth", () => {
   });
 
   it("renders the protected route for a signed-in person", () => {
-    session.signIn(identityFixtures.devToken(identityFixtures.laura));
+    session.signIn(identityFixtures.devToken(identityFixtures.student01));
     renderAt("/enrollment");
     expect(screen.getByText("enrollment portal")).toBeInTheDocument();
   });
 
   it("reacts to the session ending while the page is open (any 401 ends the session)", () => {
-    session.signIn(identityFixtures.devToken(identityFixtures.laura));
+    session.signIn(identityFixtures.devToken(identityFixtures.student01));
     renderAt("/enrollment");
     expect(screen.getByText("enrollment portal")).toBeInTheDocument();
 
