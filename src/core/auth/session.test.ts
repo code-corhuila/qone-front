@@ -11,8 +11,8 @@ const past = Math.floor(Date.now() / 1000) - 60;
 
 describe("parseJwtClaims", () => {
   it("reads sub, role, name and exp from the payload without verifying the signature", () => {
-    const claims = parseJwtClaims(token({ sub: "u-1", role: "STUDENT", name: "Laura Gómez", exp: future }));
-    expect(claims).toEqual({ sub: "u-1", role: "STUDENT", name: "Laura Gómez", exp: future });
+    const claims = parseJwtClaims(token({ sub: "u-1", role: "STUDENT", name: "Estudiante Demo 01", exp: future }));
+    expect(claims).toEqual({ sub: "u-1", role: "STUDENT", name: "Estudiante Demo 01", exp: future });
   });
 
   it("returns undefined for a malformed token", () => {
@@ -44,13 +44,13 @@ describe("session", () => {
   });
 
   it("signs in from a token, exposes the user and persists across a reload", () => {
-    const t = token({ sub: "u-1", role: "PROFESSOR", name: "Carlos Méndez", exp: future });
+    const t = token({ sub: "u-1", role: "PROFESSOR", name: "Profesor Prueba 04", exp: future });
     const result = session.signIn(t);
 
     expect(result.ok).toBe(true);
     expect(session.isAuthenticated()).toBe(true);
     expect(session.token()).toBe(t);
-    expect(session.user()).toEqual({ id: "u-1", role: "PROFESSOR", name: "Carlos Méndez" });
+    expect(session.user()).toEqual({ id: "u-1", role: "PROFESSOR", name: "Profesor Prueba 04" });
     expect(localStorage.getItem("qampus.session")).toBe(t);
 
     session.restore();

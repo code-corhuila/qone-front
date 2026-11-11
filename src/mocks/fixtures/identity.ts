@@ -1,7 +1,8 @@
-// Synthetic data of the identity domain (ADR-009). These rows ARE the seed of
-// qone-identity-db (06-data/models.md, schema `identity`): the nine people of the v1.0.0 demo
-// (quorum-one/backend/app/seed.py) so screenshots stay recognizable. Student codes drop the
-// hyphen of the prototype because the v2 contract requires digits only (^[0-9]{6,20}$).
+// Synthetic data of the identity domain (ADR-009). The eight people mirror the develop-only demo seed of
+// qone-identity-db (06-data/models.md, schema `identity`, same ids); the ADMIN is not seeded there (the identity
+// service creates it at start from BOOTSTRAP_ADMIN_EMAIL) and is listed here only so the mocks can sign it in.
+// Names and e-mails are synthetic on purpose (`.test` is a reserved TLD, RFC 2606): no real person is described.
+// Student codes are digits only, as the v2 contract requires (^[0-9]{6,20}$).
 // Shapes follow 07-api/contracts/openapi/qone-identity-api.yaml. Passwords never travel here.
 
 export interface User {
@@ -33,15 +34,15 @@ function staff(n: number, email: string, name: string, role: "PROFESSOR" | "ADMI
   return { id: `${prefix}${n}`, email, name, role, studentCode: null, program: null, semester: null, createdAt };
 }
 
-const laura = student(1, "laura.gomez@uni.edu.co", "Laura Gómez", "202110342", 6);
-const santiago = student(2, "santiago.rojas@uni.edu.co", "Santiago Rojas", "202201983", 5);
-const maria = student(3, "maria.cabrera@uni.edu.co", "María José Cabrera", "202111205", 6);
-const andres = student(4, "andres.pineda@uni.edu.co", "Andrés Pineda", "202008761", 7);
-const valentina = student(5, "valentina.suarez@uni.edu.co", "Valentina Suárez", "202009114", 7);
-const carlos = staff(1, "carlos.ramirez@uni.edu.co", "Carlos Ramírez", "PROFESSOR");
-const ana = staff(2, "ana.torres@uni.edu.co", "Ana Torres", "PROFESSOR");
-const jorge = staff(3, "jorge.medina@uni.edu.co", "Jorge Medina", "PROFESSOR");
-const admin = staff(1, "admin@uni.edu.co", "Patricia Mora", "ADMIN");
+const student01 = student(1, "estudiante.01@qampus.test", "Estudiante Demo 01", "2099000001", 6);
+const student02 = student(2, "estudiante.02@qampus.test", "Estudiante Demo 02", "2099000002", 5);
+const student03 = student(3, "estudiante.03@qampus.test", "Estudiante Demo 03", "2099000003", 6);
+const student04 = student(4, "estudiante.04@qampus.test", "Estudiante Demo 04", "2099000004", 7);
+const student05 = student(5, "estudiante.05@qampus.test", "Estudiante Demo 05", "2099000005", 7);
+const professor01 = staff(1, "profesor.01@qampus.test", "Profesor Demo 01", "PROFESSOR");
+const professor02 = staff(2, "profesor.02@qampus.test", "Profesor Demo 02", "PROFESSOR");
+const professor03 = staff(3, "profesor.03@qampus.test", "Profesor Demo 03", "PROFESSOR");
+const admin = staff(1, "admin@qampus.test", "Administrador", "ADMIN");
 
 /** An unsigned development token for a user: header.payload.signature, RS256 claimed, 8 hours. */
 function devToken(user: User): string {
@@ -58,16 +59,16 @@ function authResponse(user: User): AuthResponse {
 }
 
 export const identityFixtures = {
-  laura,
-  santiago,
-  maria,
-  andres,
-  valentina,
-  carlos,
-  ana,
-  jorge,
+  student01,
+  student02,
+  student03,
+  student04,
+  student05,
+  professor01,
+  professor02,
+  professor03,
   admin,
-  users: [laura, santiago, maria, andres, valentina, carlos, ana, jorge, admin],
+  users: [student01, student02, student03, student04, student05, professor01, professor02, professor03, admin],
   authResponse,
   devToken,
 };
