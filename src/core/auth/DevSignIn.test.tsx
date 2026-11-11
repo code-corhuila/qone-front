@@ -73,10 +73,10 @@ describe("DevSignIn", () => {
     const user = userEvent.setup();
     renderLogin("/billing");
 
-    await pasteToken(user, identityFixtures.devToken(identityFixtures.santiago));
+    await pasteToken(user, identityFixtures.devToken(identityFixtures.student02));
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(session.user()?.name).toBe("Santiago Rojas");
+    expect(session.user()?.name).toBe("Estudiante Demo 02");
     expect(screen.getByText("billing portal")).toBeInTheDocument();
   });
 
@@ -84,7 +84,7 @@ describe("DevSignIn", () => {
     const user = userEvent.setup();
     renderLogin();
 
-    await pasteToken(user, identityFixtures.devToken(identityFixtures.laura));
+    await pasteToken(user, identityFixtures.devToken(identityFixtures.student01));
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(screen.getByText("home")).toBeInTheDocument();
